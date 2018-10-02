@@ -31,11 +31,9 @@ app.use(express.static("public"));
 // First, tell the console what server.js is doing
 console.log("\n***********************************\n" +
             "Grabbing every thread name and link\n" +
-            "from reddit's webdev board:" +
             "\n***********************************\n");
 
-// Making a request for reddit's "webdev" board. The page's HTML is passed as the callback's third argument
-request("http://old.reddit.com/r/webdev/", function(error, response, html) {
+            request("https://www.nytimes.com/section/science", function(error, response, html) {
 
   // Load the HTML into cheerio and save it to a variable
   // '$' becomes a shorthand for cheerio's selector commands, much like jQuery's '$'
@@ -46,7 +44,7 @@ request("http://old.reddit.com/r/webdev/", function(error, response, html) {
 
   // With cheerio, find each p-tag with the "title" class
   // (i: iterator. element: the current element)
-  $("p.title").each(function(i, element) {
+  $("h2.headline").each(function(i, element) {
 
     // Save the text of the element in a "title" variable
     var title = $(element).text();
