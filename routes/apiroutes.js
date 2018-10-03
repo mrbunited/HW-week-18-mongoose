@@ -1,46 +1,3 @@
-var express = require("express");
-var exphbs = require("express-handlebars");
-var mongoose = require("mongoose");
-var bodyParser = require("body-parser");
-var cheerio = require("cheerio");
-var request = require("request");
-var path = require("path");
-var mongojs = require("mongojs");
-var PORT = process.env.PORT || 3000;
-
-// Initialize Express
-var app = express();
-
-// Handlebars
-app.engine("handlebars", exphbs({ defaultLayout: "main"}));
-app.set("view engine", "handlebars");
-  
-  // Routes
-//   require("./routes/apiRoutes")(app);
-//   require("./routes/htmlRoutes")(app);
-// Configure middleware
-
-// Use body-parser for handling form submissions
-app.use(bodyParser.urlencoded({ extended: true }));
-// Use express.static to serve the public folder as a static directory
-app.use(express.static("public"));
-
-// Database config
-var databaseUrl = "mongoScrapper";
-var collections = ["scrapedData"]
-var db = mongojs(databaseUrl, collections);
-db.on("error", function(error) {
-  console.log("Database Error:", error);
-});
-// Require all models
-// var Article = require("./models/Article");
-// var Note = require("./models/Note");
-
-// Here are the routes 
-
-// require("./routes/apiRoutes")(app);
-// require("./routes/htmlRoutes")(app);
-
 
 app.get("/", function(req, res) {
     res.render(path.join(__dirname, "views/index.handlebars"));
@@ -82,7 +39,7 @@ request("https://www.nytimes.com/section/science", function(error, response, htm
 
   if (title && link) {
 
-    db.scrapedData.insert({
+    db.scrapedArticles.insert({
       title: title,
       link: link
     },
@@ -108,7 +65,7 @@ request("https://www.nytimes.com/section/science", function(error, response, htm
 // Retrieve data from the db
 app.get("/saved", function(req, res) {
     // Find all results from the scrapedData collection in the db
-    db.scrapedData.find({}, function(error, found) {
+    db.scrapedArticles.find({}, function(error, found) {
       // Throw any errors to the console
       if (error) {
         console.log(error);
@@ -119,12 +76,3 @@ app.get("/saved", function(req, res) {
       }
     });
   });
-
-
-  // Start the server
-app.listen(PORT, function() {
-    console.log("App running on port " + PORT + "!");
-  });
-
-// Connect to the Mongo DB
-mongoose.connect("mongodb://localhost/week18HW");
