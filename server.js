@@ -6,7 +6,7 @@ var cheerio = require("cheerio");
 var request = require("request");
 var path = require("path");
 var mongojs = require("mongojs");
-var PORT = process.env.PORT || 3000;
+var PORT = process.env.PORT || 8080;
 
 // Initialize Express
 var app = express();
@@ -33,13 +33,8 @@ db.on("error", function(error) {
   console.log("Database Error:", error);
 });
 // Require all models
-// var Article = require("./models/Article");
-// var Note = require("./models/Note");
-
-// Here are the routes 
-
-// require("./routes/apiRoutes")(app);
-// require("./routes/htmlRoutes")(app);
+var Article = require("./models/Article");
+var Note = require("./models/Note");
 
 
 app.get("/", function(req, res) {
@@ -73,14 +68,17 @@ request("https://www.nytimes.com/section/science", function(error, response, htm
     // then save the values for any "href" attributes that the child elements may have
     var link = $(element).children().attr("href");
 
-//     // Save these results in an object
-//     results.push({
-//       title: title,
-//       link: link
-//     });
-//   });
+
 
   if (title && link) {
+
+//     // Save these results in an object
+    results.push({
+      title: title,
+      link: link
+    });
+
+
 
     db.scrapedData.insert({
       title: title,
@@ -121,6 +119,17 @@ app.get("/saved", function(req, res) {
   });
 
 
+
+app.post("/scrape", function(req, res) {
+    Article.create(req.body)
+      .then(function(dbPost) {
+        res.json(dbPost);
+      })
+      .catch(function(err) {
+        res.json(err);
+      });
+  });
+  
   // Start the server
 app.listen(PORT, function() {
     console.log("App running on port " + PORT + "!");
